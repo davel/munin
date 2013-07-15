@@ -17,7 +17,9 @@
 # limitations under the License.
 #
 
-if node['munin']['multi_environment_monitoring']
+if node['munin']['server_address']
+  munin_servers = [ node['munin']['server_address'] ]
+elsif node['munin']['multi_environment_monitoring']
   munin_servers = search(:node, "role:#{node['munin']['server_role']}")
 else  
   munin_servers = search(:node, "role:#{node['munin']['server_role']} AND chef_environment:#{node.chef_environment}")
