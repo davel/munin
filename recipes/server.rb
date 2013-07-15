@@ -53,18 +53,6 @@ end
 include_recipe "munin::client"
 
 sysadmins = search(:users, 'groups:sysadmin')
-if node['munin']['multi_environment_monitoring']
-  munin_servers = search(:node, "munin:[* TO *]")
-else  
-  munin_servers = search(:node, "munin:[* TO *] AND chef_environment:#{node.chef_environment}")
-end
-if munin_servers.empty?
-  Chef::Log.info("No nodes returned from search, using this node so munin configuration has data")
-  munin_servers = Array.new
-  munin_servers << node
-end
-
-munin_servers.sort! { |a,b| a[:fqdn] <=> b[:fqdn] }
 
 case node['platform']
 when "freebsd"
@@ -100,7 +88,7 @@ end
 template "#{node['munin']['basedir']}/munin.conf" do
   source "munin.conf.erb"
   mode 0644
-  variables(:munin_nodes => munin_servers, :docroot => node['munin']['docroot'])
+  variables(:docroot => node['munin']['docroot'])
 end
 
 case node['munin']['server_auth_method']
